@@ -31,8 +31,8 @@ def umark(dfB0, dfD0):
 	df = df1.join([df2,df3])
 	df.index = ['max', 'mean']
 	df = df.join(dfIL)
-	oval = 1-np.power((1-df.loc[:, ['rate', 'OR', 'cor', 1, 5, 'cat']]).prod(axis = 1),1/6)
-	df['uloss'] = oval
+	oval = np.power((1-df.loc[:, ['rate', 'OR', 'cor', 1, 5, 'cat']]).prod(axis = 1),1/6)
+	df['utility'] = oval
 	return df
 
 if __name__== "__main__":
@@ -46,27 +46,6 @@ if __name__== "__main__":
 # 	dfE = pd.read_csv(args[3], header=None) if len(sys.argv) == 4 else None
 	out = sys.argv[3] if len(sys.argv) == 4 else sys.stdout
 	df = umark(dfB, dfD)
-	'''
-	dfIL = iloss(dfB, dfD)
-	dfBcc = ccs(dfB)
-	dfDcc = ccs(dfD)
-	dfBor = odds(dfB)
-	dfDor = odds(dfD)
-	vB,nB = OneHot(dfB)
-	vD,nD = OneHot(dfD)
-	dfBcor = get_cor(vB,nB)
-	dfDcor = get_cor(vD,nD)
-# 	print(mae(dfBcc, dfDcc), mae(dfBor, dfDor), mae(dfBcor, dfDcor))
-	df1 = pd.DataFrame(mae(dfBcc,dfDcc))
-	df2 = pd.DataFrame(mae(dfBor,dfDor))
-	mae3 = mae(dfBcor,dfDcor)
-	df3 = pd.DataFrame((mae3[0].max(), mae3[1].mean()),columns=['cor'])
-	df = df1.join([df2,df3])
-	df.index = ['max', 'mean']
-	df = df.join(dfIL)
-	oval = 1-np.power((1-df.loc[:, ['rate', 'OR', 'cor', 1, 5, 'cat']]).prod(axis = 1),1/6)
-	df['uloss'] = oval
-	'''
 	if len(sys.argv) == 4: df.to_csv(out)
 	else: print(df)
 
