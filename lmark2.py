@@ -4,15 +4,18 @@
 import pandas as pd
 import sys
 
+def lmark(dfE, dfX):
+	reid = (dfE == dfX).sum()[0]
+	return 1 - reid/len(dfE)
+
 if __name__== "__main__":
 	args = sys.argv
-	if len(args) <= 3:
+	if len(args) <= 2:
 		print(args[0], 'E.csv X.csv')
 	
 	dfE = pd.read_csv(args[1], header=None)
 	dfX = pd.read_csv(args[2], header=None)
 	
-	reid = (dfE == dfX).sum()[0]
-	print(reid/100)
-	#df = pd.DataFrame([{'recall': rcall, 'prec': prec, 'topk': topk.sum()/supp.sum()}])
+	privacy_score = lmark(dfE, dfX)
+	print(privacy_score)
 	
