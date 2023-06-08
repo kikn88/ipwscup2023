@@ -40,6 +40,7 @@ You can use any data anonymization algorithms in the competition.
 Here, we present a couple of sample data anonymization scripts for your reference.
 
 - `rr.py` Randomized Response
+
   It replaces values at specified attributes in input data B.csv by randomly chosen values with probability 1-p (retains the original value with probability p) and outputs to C.csv.  The target attributes are specified by a string of column indexes concatenated with an underscore. Any type of value can be randomized but discrete values such as gender and race are expected. 
 
   ```
@@ -50,6 +51,7 @@ Here, we present a couple of sample data anonymization scripts for your referenc
   The example generates the randomized data C.csv for columns 0, 2, 3, 4, 6, 7, and 10 with 1-0.9 probability. 
 
 - `lap.py`  adds Laprace noise
+
   It adds the Laprace noise to the specified list of attributes that take numerical values, e.g., age and BMI. 
 
   ```
