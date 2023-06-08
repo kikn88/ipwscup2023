@@ -62,7 +62,7 @@ Arbitrary algorithm can be used for data anonymization. Here are some samples.
 
 
 
-### Statistics Analysis 
+### Utility Metrics 
 
 The followings are the metrics for the utility loss inccured by anonymizations. 
 
@@ -103,7 +103,6 @@ The followings are the metrics for the utility loss inccured by anonymizations.
 
   where **0_Female** represents value 'Female' in 0-th column and **1** shows 1st column (age). The male and female are excluded and hence the correlation is -1. There is a weak negative correlation (-0.0048204) between 'female' and age. 
   
-
 - `odds6.py`　Odds Ratio
 
   It performs the mutiple logistic regression for given data B and C and outputs the mean absoute error in odds ratios (OR) and p-values between them. 
@@ -122,162 +121,117 @@ The followings are the metrics for the utility loss inccured by anonymizations.
   | bmi         | 0.06199413 | 1.06395609 | 1.04E-23   |
 
   , where OR = 1.18 (T.Male) represents that male has higher risk in diabets than female with statistical significant (pvalue = 0.023). The good anonymized data preserves the ORs  as exactly same to the original data. 
-
-### Recode Linking
-
-- Pick.py テストレコードのサンプリング
-
-  ```
-  pick.py B.csv Ex.csv C.csv Ea.csv
-  例）pick.py B.csv e-x.csv c-100.csv e-a.csv
-  ```
-
-- attack.py レコードリンケージによるメンバーシップ攻撃．ユークリッド距離によるKDTreeを構築して探索している (PWS Cup 2020参照)
-
-- rlink.py 
-
-  ```
-  rlink.py  C.csv D.csv E.csv
-  例)rlink.py c-100.csv d-xrrdp.csv e-100xrrdp.csv
-  ```
-
-  テストデータCの各行が匿名化データDに属さないときは-1（非メンバーシップ），属するときは何行目かを上位k(=3)位まで予測して，Eに出力する．各列のメジアンよりも距離がある行を，-1と推測する（丁度50行を-1と推測する）．レコード間距離は，One Hot Encodingしてユークリッド距離を用いる．列8 (gh), 9 (mets)は用いない．
-  sklearnのKDTree関数を用いたattack.py を呼んでいる．
   
+- `iloss2.py` **I**nformation **Loss**
+  It quantifies the loss of information between the orignal and the pertubted data. The distance between values x and y varies with type of attributes:  |x - y| for numerical values such as age and BMI, and the Hamming weight, i.e., the number of inconsistent values for categorical values such as gender, and marital status. Note that the distances are normalized by dividing constants and the ranges are [0,1]. 
+
+  ```
+  iloss2.py B.csv C.csv
+  ```
+
+  It generates the information loss incurred by anonymization performed for C from B. 
+
+  |      | 1 (age)  | 5 (BMI)  | cat      | max      |
+  | ---- | -------- | -------- | -------- | -------- |
+  | max  | 0.500000 | 0.225000 | 0.500000 | 0.500000 |
+  | mean | 0.054475 | 0.035693 | 0.057906 | 0.057906 |
+
+  where column cat provides the Hamming distance of 8-dimensional vector for categorical values, including gender, race, education, marital status, depression, poor index, quantified METS, and diabetes. 
+
+- `umark2.py` **u**tility bench**mark** 
+
+  It provides the overall loss of utility metrics defined from several perspectives: cross count  `ccount.py`, corvariance matrix `cor.py`, odds ratio `odds6.py`, and informtion loss `iloss2`. These distances are multiplicatively aggregated.  
+
+  ```
+  umark B.csv C.csv
+  ```
+
+  gives the following table
+
+  |      | cnt       | rate       | Coef       | OR         | pvalue     | cor        | 1          | 5          | cat        | max        | uloss      |
+  | ---- | --------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |
+  | max  | 191       | 0.04558473 | 0.20702854 | 0.12078671 | 0.3405941  | 0.05519111 | 0.5        | 0.225      | 0.5        | 0.5        | 0.26818234 |
+  | mean | 26.921875 | 0.00642527 | 0.04763524 | 0.04075512 | 0.09900669 | 0.00914453 | 0.05447494 | 0.03569332 | 0.05790573 | 0.05790573 | 0.03427423 |
+
+  where the last column **uloss** indicates the overall utility loss score aggregated all metrics. Namely, the pertubted data `C.csv` loses its utility as 0.26818234 through the processing for anonymizations. 
+
+### Risk Metrics
+
+- `Pick2.py` sampling records
+
+  ```
+  pick2.py C.csv D.csv X.csv
+  ```
+
+  It generates the challenge data `D.csv` that contains 100 records randomly sampled from the pertubted `C.csv`. The sampled record indexes are  suffuled and then stored into the correct indexes file `X.csv`.  Typically, a judge performs the sampling and makes `D.csv` available to all attackers without the correct `X.csv`. 
+
+- rlink2.py record linkage 
+
+  ```
+  rlink2.py  B.csv D.csv  E.csv
+  ```
+
+  It attempts to link the records in the original data `B.csv` with the pertubted records in `D.csv` and write the corresponging records in the `B.csv` to `E.csv`. `E.csv` consists of the estimated indexes of the records b* in B for each record d in D that has the smallest Euclid distance between b* and d.  For example, 
+
+  ```
+  1605
+  2580
+  3142
+  ..
+  ```
+
+  means that the 1st, 2nd and 3rd records in `D.csv` are estimated as anonymized from 1605-th, 2580-th and 3142-th records in `B.csv`. 
+
+  The discrete values e.g. gender and educations are converted into numerical values represented with one-hot encording. Note that historical attributes (8th gh and 9th mets) are not used. The attack.py, coded by Mr. Satoshi Hasegawa, uses the KDTree in sklearn to search the shortest vectors. 
+
+- `lmark2.py`　**L**inkage bench**mark** 
+
+  It evaulates the re-identified risk of a perturbted data. 
+
+  ```
+  lmark2.py E.csv X.csv
+  ```
+
+   It computes the fraction of correctly estimated record indexes in E.csv computed with the correct indexes X.csv.  
+
+
+
+### Others
+
+- `checkD.py `   format check of the anonymized records　
+  It checks if the value of the pertubted data belongs the specified range as follows. 
+
+  ```
+      # Numerical data range check
+      checkrange(dfC, 1, 13, 87)
+      checkrange(dfC, 5, 8, 52)
+      checkrange(dfC, 6, 0, 1)
+      checkrange(dfC, 7, 0, 1)
+      checkrange(dfC, 11, 0, 1)
   
-
-### 有用性評価 Utility Metirics 
-- `umark.py`		**U**tlity bench**mark** 
-
-  ```
-  umark B.csv D.csv
-  ```
-
-  有用性評価．BとDの，クロス集計(cnt, rate), オッズ比(Coef,OR,pvalue), 共分散cor の最大値と平均値を出力．
-
-  |      | cnt   | rate  | Coef  | OR    | pvalue | cor   |
-  | ---- | ----- | ----- | ----- | ----- | ------ | ----- |
-  | max  | 69    | 0.020 | 0.309 | 0.061 | 0.159  | 0.006 |
-  | mean | 2.530 | 0.001 | 0.031 | 0.017 | 0.028  | 8E-05 |
-
-- `Iloss.py` **I**nformation **Loss**
-
-  ```
-  iloss.py C.csv D.csv
-  ```
-  
-  有用性評価．CとDの，行を対応させたL1距離の最大値を評価する．(Max列のMax行の値)
-  例）
-
-	|      | 1    | 5    | cat  | Max  |
-  | ---- | ---- | ---- | ---- | ---- |
-  |mean |1.085297| 0.723084| 0.443483| 1.085297|
-	|max  |8.000000| 4.400000| 4.000000| 8.000000|
-
-
-
-
-### 安全性評価 Privacy Metrics 
-- `lmark.py`　**L**inkage bench**mark** 
-
-  ```
-  lmark     Ea.csv  E.csv [out.csv]
-  例) lmark.py e-a.csv e-100xrrdp.csv
+      # Categorical data check
+      checkvalues(dfC, 0, {'Female', 'Male'})
+      checkvalues(dfC, 2, {'Black', 'Hispanic', 'Mexican', 'Other', 'White'})
+      checkvalues(dfC, 3, {'11th', '9th', 'College', 'Graduate', 'HighSchool', 'Missing', np.nan})
+      checkvalues(dfC, 4, {'Divorced', 'Married', 'Never', 'Parther', 'Separated', 'Widowed'})
+      checkvalues(dfC, 10, {'Q1', 'Q2', 'Q3', 'Q4'})
   ```
 
-  正解行番号Ea.csv と推定行番号E.csv を検査して，次の安全性 recall, precision, top-k を評価する．
-  $$
-  recall = \frac{|E_a \cap E|}{|E_a|}, \, prec = \frac{|E_a \cap E|}{|E|}, top_k = \frac{|\{x \in E_a| x \in E[x]\}|}{k}
-  $$
-  ここで，E_a とEは`Ea.csv` と`E.csv` の中の正の行番号(＝排除されていない行）からなる集合とする．$E[x]$​​ は行xに対応する推測行番号の上位k位までの集合．
-  
-  
+  Numerical date (1,5,6,7,11) must be either integer or real values.  For example, 13 <= age (1) <= 87.  
 
-### フォーマットチェッカー
-
-- `checkDX.py`　
-  加工フェーズの提出物(匿名化データD, 排除行データX)の形式チェック
-
-  ```
-  checkDX.py B.csv D.csv X.csv
-  例）python3 checkDX.py Csv/B.csv Csv/d-xrrdp.csv Csv/e-x.csv 
-  D: num OK
-  D: obj OK
-  0 OK
-  2 OK
-  3 OK
-  4 OK
-  10 OK
-  (2724, 12) OK
-  X: int OK
-  X: unique OK
-  (695, 1) OK
-  ```
-
-  Dに関しては，
-
-  1. 数値列(1,5,6,7,11)が整数または実数であるか
-  2. 名義列(0,2,3,4,10)がオブジェクトであるか
-  3. 列1(年齢)，列5(BMI)が，値域[13, 85], [13, 75]にあるか，列6(鬱病)，列7(貧困), 列11(糖尿病)が{0,1}の値か．
-  4. 列0 (性別)，列2(人種)，列3(学歴)，列4(既婚歴)，列10(活動量)がB.csv の値域の中にあるかどうか
-  5. Dの行数が$|B|/2 = 1709$行以上あり，12 列あるか．
-  
-  をそれぞれ検査します．Xに関しては，
-  
-  1. 整数型であるか
-  2. 重複する行を指定していないか
-  3. $|X|_{行数}+|D|_{行数} = |B|_{行数}$​ になっているか
-  
-  を検査しています．全てに OK が出れば合格です．
+  Categorical values (0,2,3,4, 10) must be in the ranges in the original data. It alarts any invalid values. 
 
 
 
-### 実行スクリプト
+### Sample scripts
 
-`bash スクリプト名`で実行する．（OSによってshが使えない時は，スクリプト内のpytest の部分だけを順に実行）
+All steps in the competition can be performed in some sample shell scripts. Run  test-script as following steps: 1, 3 for anonymizing  pharse and 5 for attacking phrases. Step 2 and 4 are for the competiton organizer (judge)
 
-1. `test-0config.sh` 自分のチーム番号Team, 攻撃先チーム番号You，pythonのパス，生成ファイル格納ディレクトリCsvなどを設定する．
-
-2. `test-1setup.sh` ヘルスケアデータをCDCからダウンロードする．最初に一度だけ実行する．全ファイルを落とすのに数秒かかる．
-
-3. `test-2anonymize.sh` （匿名化フェーズ）加工から有用性評価を実行する．Category_encodersのwarningが出ることもある．rr, dp はランダム要素があり，毎回結果が違う．
-
-     ```
-     $ bash test-2anonymize.sh
-     top2.py Csv/B.csv 1_5 75_50 Csv/e-top.csv
-     bottom2.py Csv/B.csv 1_5 22_20 Csv/e-bot.csv
-     kanony2.py Csv/B.csv 7 2_3_4 Csv/e-ka.csv
-     exclude.py Csv/B.csv Csv/pre_anony_00_x.csv Csv2/C.csv Csv2/e-in2.csv
-     umark.py Csv/B.csv Csv/C.csv
-                  cnt      rate      Coef        OR    pvalue       cor
-     max   519.000000  0.061190  0.749521  0.288657  0.383715  0.135895
-     mean  114.106061  0.007815  0.101983  0.072791  0.086014  0.012597
-     uniqrt.py Csv/C.csv
-     2360 0.7038473009245452 0.5632458233890215
-     rr.py Csv/C.csv 0.9 Csv/d-xrr2.csv 0_2_3_4_6_7_10
-     dp2.py Csv/d-xrr2.csv 1_5 1.0_2.0 Csv2/pre_anony_00_d.csv
-     umark.py Csv/B.csv Csv/pre_anony_00_d.csv
-                  cnt      rate      Coef        OR    pvalue       cor
-     max   596.000000  0.065067  0.385540  0.218689  0.455050  0.182816
-     mean  114.606061  0.010027  0.102278  0.082985  0.129358  0.015871
-     ```
-
-4. `test-3pick.sh`　評価データをBからテストデータCTをサンプリングする．事務局が行なう処理．
-
-5. `test-4rlink.sh` （攻撃フェーズ）メンバーシップ推定とレコードリンクを試み，推定結果を出力する．
-
-   ```
-   $ bash test-4rlink.sh 
-   rlink.py Csv/pre_anony_00_c.csv Csv/pre_anony_00_d.csv Csv/pre_attack_00_from_00.csv
-   lmark.py Csv/pre_anony_00_ea.csv Csv/pre_attack_00_from_00.csv
-   lmark.py Ea.csv E.csv out.csv
-   recall    0.84
-   prec      0.84
-   topk      0.74
-   dtype: float64
-   ```
-
-6. Test-5check.sh 提出ファイル(D, X, E)のフォーマット検査を行なう．全てにOK が出れば良い．
+1. `bash test-1setup.sh` downloads NHANES 2017 data from CDC and converts the SAS format to CSV.  You can customize `test-0config.sh` where  the team ID (00) and the target team IDs (00) ,  the default path and all necessary file names are specified. Note it takes few minutes. You don't have to execute it because the Judge uses it to synthsize B.csv distributed to every teams. 
+2. Judge synthesizes B.csv based on A.csv (NHAENS 2017). The source is not available. 
+3. `bash test-3anonymize.sh` performs sample anonymizations using `rr.py` and `lap.py` and generates pertubuted data `C.csv`. Utility loss score are reported here. 
+4. ``bash test-4pick.sh`　is performed by the judge and stores the sampled records `D.csv` and the corresponding indexes `X.csv`. 
+5. `test-5rlink.sh` performs record linkage attack to the target C.csv and evaulates the re-identified risk score. 
 
 
 
