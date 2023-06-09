@@ -21,7 +21,7 @@ The data anonymization competition, iPWS Cup 2023, aims to explore the practical
 
 ### Generating Dataset
 
-- `activ_diabet10_csv.py` download a required healthcare date from US CDC NHANES. The data consists of 12 attributes, indicating gender, age, race, educational level, marital status, BMI (body mass index) depressed state, poverty level, and physical variables for 4,190 participants in NHANES 2017-2018. Note that attributes labeled as 'gh' and 'mets' are not used for the competition. The diabetes patients are indicated as attributes labeled as 'dia'.  The downloaded file is stored in A.csv as, 
+- `activ_diabet10_csv.py` download a required healthcare date from US CDC NHANES. The data consists of 12 attributes, indicating gender, age, race, educational level, marital status, BMI (body mass index) depressed state, poverty level, and physical variables for 3,985 participants in NHANES 2017-2018. Note that attributes labeled as 'gh' and 'mets' are not used for the competition. The diabetes patients are indicated as attributes labeled as 'dia'.  The downloaded file is stored in A.csv as, 
 
   ```
   python activ_diabet10_csv.py A.csv
@@ -240,7 +240,7 @@ Here, we present a sample re-identification script for your reference.
   ```
       # Numerical data range check
       checkrange(dfC, 1, 13, 87)
-      checkrange(dfC, 5, 8, 52)
+      checkrange(dfC, 5, 8, 91)
       checkrange(dfC, 6, 0, 1)
       checkrange(dfC, 7, 0, 1)
       checkrange(dfC, 11, 0, 1)

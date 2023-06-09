@@ -37,7 +37,7 @@ def checkC(dfB, dfC):
 
     # Numerical data range check
     checkrange(dfC, 1, 13, 87)
-    checkrange(dfC, 5, 8, 52)
+    checkrange(dfC, 5, 8, 91)
     checkrange(dfC, 6, 0, 1)
     checkrange(dfC, 7, 0, 1)
     checkrange(dfC, 11, 0, 1)
