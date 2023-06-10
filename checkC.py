@@ -45,7 +45,7 @@ def checkC(dfB, dfC):
     # Categorical data check
     checkvalues(dfC, 0, {'Female', 'Male'})
     checkvalues(dfC, 2, {'Black', 'Hispanic', 'Mexican', 'Other', 'White'})
-    checkvalues(dfC, 3, {'11th', '9th', 'College', 'Graduate', 'HighSchool', 'Missing', np.nan})
+    checkvalues(dfC, 3, {'11th', '9th', 'College', 'Graduate', 'HighSchool'})
     checkvalues(dfC, 4, {'Divorced', 'Married', 'Never', 'Parther', 'Separated', 'Widowed'})
     checkvalues(dfC, 10, {'Q1', 'Q2', 'Q3', 'Q4'})
     

@@ -233,7 +233,7 @@ Here, we present a sample re-identification script for your reference.
 
 ### Others
 
-- `checkD.py `   format check of the anonymized records 
+- `checkC.py `   format check of the anonymized records 
 
   It checks if the value of the perturbed data belongs to the specified range as follows. 
 
@@ -248,7 +248,7 @@ Here, we present a sample re-identification script for your reference.
       # Categorical data check
       checkvalues(dfC, 0, {'Female', 'Male'})
       checkvalues(dfC, 2, {'Black', 'Hispanic', 'Mexican', 'Other', 'White'})
-      checkvalues(dfC, 3, {'11th', '9th', 'College', 'Graduate', 'HighSchool', 'Missing', np.nan})
+      checkvalues(dfC, 3, {'11th', '9th', 'College', 'Graduate', 'HighSchool'})
       checkvalues(dfC, 4, {'Divorced', 'Married', 'Never', 'Partner', 'Separated', 'Widowed'})
       checkvalues(dfC, 10, {'Q1', 'Q2', 'Q3', 'Q4'})
   ```
