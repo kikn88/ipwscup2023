@@ -257,6 +257,12 @@ Here, we present a sample re-identification script for your reference.
 
   Categorical values (0,2,3,4, 10) must be in the ranges in the original data. It alerts any invalid values. 
 
+- `checkE.py `   format check of the estimated index
+
+  It checks if the format and values of the estimated index are ok.
+
+  - Check if there are 100 estimated indexes
+  - Check if the indexes are numerical values and are in the range of 0 - 3984
 
 
 ### Sample scripts
