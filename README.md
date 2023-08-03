@@ -183,7 +183,7 @@ The followings are a detailed description of the metrics used for calculating th
   python pick2.py C.csv D.csv X.csv
   ```
 
-  It generates the challenge data `D.csv` that contains 100 records randomly sampled from the perturbed `C.csv`. The sampled record indexes are shuffled and then stored in the correct indexes file `X.csv`.
+  It generates the challenge data `D.csv` that contains 300 records randomly sampled from the perturbed `C.csv`. The sampled record indexes are shuffled and then stored in the correct indexes file `X.csv`.
   
   This code is basically run by the judge to perform the sampling and generate `D.csv`.  `D.csv` will be made available to all attackers whereas the correct `X.csv` will be kept secret. 
 
@@ -261,7 +261,7 @@ Here, we present a sample re-identification script for your reference.
 
   It checks if the format and values of the estimated index are ok.
 
-  - Check if there are 100 estimated indexes
+  - Check if there are 300 estimated indexes
   - Check if the indexes are numerical values and are in the range of 0 - 3984
 
 

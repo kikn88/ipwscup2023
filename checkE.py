@@ -7,11 +7,11 @@ import sys
 throwExceptionFlag = 1
     
 def checkE(dfE):
-    rows = 100
+    rows = 300
     n = 3985 
 
     # Format check
-    if dfE.shape == (100, 1):
+    if dfE.shape == (rows, 1):
         print(dfE.shape, "OK")
     else:
         print(dfE.shape, "INVALID")
